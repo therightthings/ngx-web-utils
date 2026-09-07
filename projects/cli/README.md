@@ -143,7 +143,7 @@ Highlighting is available for both terminal ANSI output and generated HTML docum
 ## Reusing `Highlighter`
 
 ```ts
-import { Highlighter } from '@trt-web/cli';
+import { Highlighter } from '@trt-web/cli/highlighter';
 
 import '@trt-web/cli/highlighter.css';
 
