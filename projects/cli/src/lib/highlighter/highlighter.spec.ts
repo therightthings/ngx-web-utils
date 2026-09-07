@@ -25,4 +25,23 @@ describe('Highlighter', () => {
     expect(bash).toContain('token-operator');
     expect(bash).not.toContain('token-operator">-web');
   });
+
+  it('highlights comments according to each language configuration', () => {
+    const bash = Highlighter.highlight(
+      { content: '# install the package\nnpm test', language: 'bash' },
+      { output: 'html' },
+    );
+    const typescript = Highlighter.highlight(
+      { content: '// note\nconst value = 1;', language: 'ts' },
+      { output: 'html' },
+    );
+    const html = Highlighter.highlight(
+      { content: '<!-- note -->\n<div></div>', language: 'html' },
+      { output: 'html' },
+    );
+
+    expect(bash).toContain('<span class="token-comment"># install the package</span>');
+    expect(typescript).toContain('<span class="token-comment">// note</span>');
+    expect(html).toContain('<span class="token-comment">&lt;!-- note --&gt;</span>');
+  });
 });

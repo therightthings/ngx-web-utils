@@ -35,13 +35,14 @@ export class Highlighter {
     const names = utilityNames.length ? utilityNames.map(this.escapeRegExp).join('|') : '(?!)';
     const colors: CodeThemeDetail = typeof theme === 'string' ? THEME_MAP[theme] : theme;
     const languageConfig = KEYWORD_MAP[language];
+    const comments = languageConfig.comments.join('|');
     const keywords = languageConfig.keywords.map(this.escapeRegExp).join('|');
     const builtInTypes = languageConfig.types.map(this.escapeRegExp).join('|') || '(?!)';
     const commands = languageConfig.commands?.map(this.escapeRegExp).join('|') || '(?!)';
     const bashOption =
       language === 'bash' ? '(?:--[A-Za-z][\\w-]*|-[A-Za-z])(?![A-Za-z0-9_-])' : '(?!)';
     const tokenPattern = new RegExp(
-      `(\\/\\/.*$|<!--.*?-->|\\/\\*[\\s\\S]*?\\*\\/|(?:^|\\s)#.*$|"(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*'|\\x60(?:\\\\.|[^\\x60\\\\])*\\x60)|\\b(${names})\\b|\\b(${keywords})\\b|\\b(${commands})\\b|(${bashOption})|\\b(\\d+(?:\\.\\d+)?)\\b|\\b(${builtInTypes})\\b|\\b([A-Z][A-Za-z0-9_$]*)\\b|(=>)|\\b([A-Za-z_$][\\w$]*)(?=\\s*\\()|\\b([A-Za-z_$][\\w$]*)\\b`,
+      `(${comments}|"(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*'|\\x60(?:\\\\.|[^\\x60\\\\])*\\x60)|\\b(${names})\\b|\\b(${keywords})\\b|\\b(${commands})\\b|(${bashOption})|\\b(\\d+(?:\\.\\d+)?)\\b|\\b(${builtInTypes})\\b|\\b([A-Z][A-Za-z0-9_$]*)\\b|(=>)|\\b([A-Za-z_$][\\w$]*)(?=\\s*\\()|\\b([A-Za-z_$][\\w$]*)\\b`,
       'g',
     );
 
@@ -62,12 +63,7 @@ export class Highlighter {
         variable?: string,
       ) => {
         if (stringLiteral) {
-          if (
-            token.startsWith('//') ||
-            token.startsWith('/*') ||
-            token.startsWith('<!--') ||
-            token.trimStart().startsWith('#')
-          ) {
+          if (new RegExp(`^(?:${comments})$`).test(token)) {
             return this.renderToken('comment', colors.comment, token, output);
           }
           return this.renderToken('string', colors.string, token, output);

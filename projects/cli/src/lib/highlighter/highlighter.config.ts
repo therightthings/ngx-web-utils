@@ -20,9 +20,11 @@ export const KEYWORD_MAP: Record<
     keywords: readonly string[];
     types: readonly string[];
     commands?: readonly string[];
+    comments: readonly string[];
   }
 > = {
   ts: {
+    comments: ['//[^\\n]*', '/\\*[\\s\\S]*?\\*/'],
     keywords: [
       'as',
       'async',
@@ -87,6 +89,7 @@ export const KEYWORD_MAP: Record<
     ],
   },
   js: {
+    comments: ['//[^\\n]*', '/\\*[\\s\\S]*?\\*/'],
     keywords: [
       'async',
       'await',
@@ -119,6 +122,7 @@ export const KEYWORD_MAP: Record<
     types: [],
   },
   html: {
+    comments: ['<!--[\\s\\S]*?-->'],
     keywords: [
       'doctype',
       'html',
@@ -134,6 +138,7 @@ export const KEYWORD_MAP: Record<
     types: [],
   },
   css: {
+    comments: ['/\\*[\\s\\S]*?\\*/'],
     keywords: [
       'important',
       'inherit',
@@ -150,6 +155,7 @@ export const KEYWORD_MAP: Record<
     types: [],
   },
   scss: {
+    comments: ['//[^\\n]*', '/\\*[\\s\\S]*?\\*/'],
     keywords: [
       'mixin',
       'include',
@@ -173,6 +179,7 @@ export const KEYWORD_MAP: Record<
     types: [],
   },
   bash: {
+    comments: ['#[^\\n]*'],
     keywords: [
       'if',
       'then',

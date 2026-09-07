@@ -4,6 +4,7 @@ const search = document.querySelector('#search');
 const searchClear = document.querySelector('#search-clear');
 const links = [...document.querySelectorAll('.utility-link')];
 const utilities = [...document.querySelectorAll('.utility')];
+const copyButtons = [...document.querySelectorAll('.copy-code')];
 const groups = [...document.querySelectorAll('.group')];
 const toggleAll = document.querySelector('#toggle-all');
 const savedTheme = localStorage.getItem('doc-theme');
@@ -100,3 +101,15 @@ searchClear.onclick = () => {
   search.dispatchEvent(new Event('input'));
   search.focus();
 };
+
+copyButtons.forEach((button) => {
+  button.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(decodeURIComponent(button.dataset.code || ''));
+      button.classList.add('copied');
+      window.setTimeout(() => button.classList.remove('copied'), 2000);
+    } catch {
+      button.classList.remove('copied');
+    }
+  };
+});

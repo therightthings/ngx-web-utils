@@ -1,6 +1,65 @@
 # @trt-web/browser
 
-Framework-free wrappers for modern browser APIs and web platform features.
+## Introduction
+
+- `@trt-web/browser` is a framework-agnostic TypeScript toolkit for working with modern browser APIs and Web Platform features.
+
+- It provides focused, strongly typed wrappers for media, audio, storage, permissions, speech, networking, window management, device APIs, and browser-native AI capabilities where supported. The APIs are designed to stay close to the Web Platform while providing a consistent and reusable interface for common browser interactions.
+
+- Use `@trt-web/browser` to build dashboards, PWAs, productivity tools, media experiences, and other modern browser-based applications.
+
+---
+
+**Why `@trt-web/browser`?**
+
+- Framework-agnostic and suitable for TypeScript or JavaScript applications.
+- Strongly typed APIs built around native browser capabilities.
+- Modular utilities that can be adopted independently.
+- Explicit handling for unsupported APIs and permission-based features.
+
+---
+
+**Install**
+
+- Install the package using your preferred package manager:
+
+```bash
+npm install @trt-web/browser
+```
+
+```bash
+yarn add @trt-web/browser
+```
+
+```bash
+bun add @trt-web/browser
+```
+
+---
+
+**CLI**
+
+- The package includes trt-browser, an interactive CLI for discovering available utilities, exploring methods and usage examples, and generating static documentation from the package README.
+
+```bash
+npx trt-browser
+npx trt-browser --list
+npx trt-browser info BrowserCamera # or any available utility name
+npx trt-browser docs
+```
+
+---
+
+**For Contributors**
+
+- All contributions are welcome.
+
+- If you find a bug, want to improve an existing API, or have an idea for a new Web Platform utility, please see `CONTRIBUTING.md` for contribution guidelines, testing expectations, and pull request requirements.
+
+- Contact:
+  - Github: [therightthings/trt-web](https://github.com/therightthings/trt-web)
+  - NPM: [@trt-web/browser](https://www.npmjs.com/package/@trt-web/core)
+  - Email: nanam133hg@gmail.com (Nam Nguyen)
 
 ## BrowserAI
 
