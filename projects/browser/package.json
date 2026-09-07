@@ -1,6 +1,7 @@
 {
   "name": "@trt-web/browser",
   "version": "1.0.3",
+  "private": false,
   "type": "module",
   "main": "./src/public-api.js",
   "module": "./src/public-api.js",
@@ -10,6 +11,14 @@
     "trt-browser": "./src/cli.js"
   },
   "description": "Framework-free wrappers for modern browser APIs and web platform features.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/therightthings/trt-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/therightthings/trt-web/issues"
+  },
+  "homepage": "https://browser.trt-web.surge.sh",
   "keywords": [
     "browser-utils",
     "web-utils",
@@ -57,7 +66,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@trt-web/cli": "^1.0.2",
+    "@trt-web/cli": "^1.1.0",
     "@trt-web/core": "^1.6.2",
     "commander": "^15.0.0",
     "enquirer": "^2.4.1",

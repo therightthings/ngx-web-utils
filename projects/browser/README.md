@@ -171,8 +171,6 @@ audioSession?.play();
 await new Promise((resolve) => setTimeout(resolve, (audioBuffer?.duration ?? 0) * 1000));
 audioSession?.stop();
 
-await audioContext.close();
-
 const toneSession = audioContext.createToneSession({
   tones: [
     { frequency: 523, type: 'sine', gain: 0.08, durationMs: 300, gapMs: 40 },
@@ -202,6 +200,8 @@ playbackSession?.createAnalyser({ fftSize: 2048 });
 console.log(playbackSession?.getFrequencyData());
 console.log(playbackSession?.getTimeDomainData());
 console.log(playbackSession?.getWaveformData({ samples: 500 }));
+
+await audioContext.close();
 ```
 
 ## BrowserBattery
@@ -217,6 +217,8 @@ Battery status helpers
 ### Examples
 
 ```ts
+import { BrowserBattery } from '@trt-web/browser';
+
 if (BrowserBattery.isSupported()) {
   const state = await BrowserBattery.getState();
   console.log(state);
@@ -264,17 +266,18 @@ Web Bluetooth helpers
 ```ts
 import { BrowserBluetooth } from '@trt-web/browser';
 
-const device = await BrowserBluetooth.requestDevice({
-  filters: [{ services: ['heart_rate'] }],
-});
-await BrowserBluetooth.connect(device);
-console.log(BrowserBluetooth.getDevice(), BrowserBluetooth.getServer());
-const value = await BrowserBluetooth.readValue({
-  service: 'heart_rate',
-  characteristic: 'heart_rate_measurement',
-});
-await BrowserBluetooth.disconnect();
-console.log(value);
+if (BrowserBluetooth.isSupported() && (await BrowserBluetooth.isAvailable())) {
+  // Run this from a user gesture, such as a button click.
+  const device = await BrowserBluetooth.requestDevice({
+    filters: [{ services: ['heart_rate'] }],
+  });
+  const server = await BrowserBluetooth.connect(device);
+  if (server) {
+    const value = await BrowserBluetooth.readValue('heart_rate', 'heart_rate_measurement');
+    console.log(value);
+    await BrowserBluetooth.disconnect();
+  }
+}
 ```
 
 ## BrowserCamera
@@ -295,9 +298,9 @@ Camera capture and recording
 ```ts
 import { BrowserCamera } from '@trt-web/browser';
 
-const video = document.querySelector<HTMLVideoElement>('#camera-preview')!;
+const video = document.querySelector<HTMLVideoElement>('#camera-preview');
 const result = await BrowserCamera.turnOn({ facingMode: 'front' });
-if (result.success) {
+if (result.success && video) {
   video.srcObject = result.data;
 
   const recorder = await BrowserCamera.createRecorder({ mimeType: 'video/webm' });
@@ -308,6 +311,8 @@ if (result.success) {
   console.log(output?.blob);
 
   BrowserCamera.turnOff();
+} else {
+  console.error('Camera access was denied or is not supported.');
 }
 ```
 
@@ -654,11 +659,13 @@ Web NFC helpers
 ```ts
 import { BrowserNfc } from '@trt-web/browser';
 
-await BrowserNfc.startScan({
-  onReading: (event) => console.log(event.message),
-});
-await BrowserNfc.write({ records: [{ recordType: 'text', data: 'Hello NFC' }] });
-BrowserNfc.stopScan();
+if (BrowserNfc.isSupported()) {
+  await BrowserNfc.startScan({
+    onReading: (event) => console.log(event.message),
+  });
+  await BrowserNfc.write({ records: [{ recordType: 'text', data: 'Hello NFC' }] });
+  BrowserNfc.stopScan();
+}
 ```
 
 ## BrowserNotification
@@ -776,8 +783,7 @@ await BrowserPeerConnection.setLocalDescription(offer);
 BrowserPeerConnection.close();
 
 if (offer) {
-  const connection = await BrowserPeerConnection.createConnectionFromOffer({
-    offer,
+  const connection = await BrowserPeerConnection.createConnectionFromOffer(offer, {
     handlers: { onIceCandidate: (event) => console.log(event.candidate) },
   });
   connection?.close();
@@ -809,8 +815,8 @@ Performance API helpers
 import { BrowserPerformance } from '@trt-web/browser';
 
 const result = await BrowserPerformance.measureAsync('load-users', async () => {
-  const response = await fetch('/api/users');
-  return response.json();
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  return [{ id: 1, name: 'Alice' }];
 });
 
 console.log(result?.value, result?.measure.duration);
@@ -973,11 +979,14 @@ Speech recognition helpers
 ```ts
 import { BrowserSpeechToText } from '@trt-web/browser';
 
-const text = await BrowserSpeechToText.recognize({
-  lang: 'en-US',
-  interimResults: true,
-});
-console.log(text);
+if (BrowserSpeechToText.isSupported()) {
+  // Start recognition from a user gesture, such as a button click.
+  const text = await BrowserSpeechToText.recognize({
+    lang: 'en-US',
+    interimResults: true,
+  });
+  console.log(text);
+}
 ```
 
 ## BrowserTextToSpeech
@@ -1000,8 +1009,10 @@ Speech synthesis helpers
 ```ts
 import { BrowserTextToSpeech } from '@trt-web/browser';
 
-await BrowserTextToSpeech.speak('Hello from the browser', { lang: 'en-US' });
-console.log(BrowserTextToSpeech.isSpeaking());
+if (BrowserTextToSpeech.isSupported()) {
+  await BrowserTextToSpeech.speak('Hello from the browser', { lang: 'en-US' });
+  console.log(BrowserTextToSpeech.isSpeaking());
+}
 ```
 
 ## BrowserTabActivity
@@ -1069,8 +1080,10 @@ Vibration API helpers
 ```ts
 import { BrowserVibration } from '@trt-web/browser';
 
-BrowserVibration.vibrate([200, 100, 200]);
-BrowserVibration.cancel();
+if (BrowserVibration.isSupported()) {
+  BrowserVibration.vibrate([200, 100, 200]);
+  BrowserVibration.cancel();
+}
 ```
 
 ## BrowserViewport
@@ -1139,9 +1152,11 @@ Screen wake lock helpers
 ```ts
 import { BrowserWakeLock } from '@trt-web/browser';
 
-await BrowserWakeLock.enable();
-console.log(BrowserWakeLock.isActive());
-await BrowserWakeLock.disable();
+if (BrowserWakeLock.isSupported()) {
+  const enabled = await BrowserWakeLock.enable();
+  console.log(enabled, BrowserWakeLock.isActive());
+  await BrowserWakeLock.disable();
+}
 ```
 
 ## BrowserWindow

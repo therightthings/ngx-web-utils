@@ -10,7 +10,7 @@
   "bugs": {
     "url": "https://github.com/therightthings/trt-web/issues"
   },
-  "homepage": "https://github.com/therightthings/trt-web#readme",
+  "homepage": "https://angular.trt-web.surge.sh",
   "keywords": [
     "angular",
     "angular-library",
@@ -34,7 +34,7 @@
   "dependencies": {
     "@angular/aria": "^22.0.4",
     "@trt-web/browser": "^1.0.3",
-    "@trt-web/cli": "^1.0.2",
+    "@trt-web/cli": "^1.1.0",
     "@trt-web/core": "^1.6.2",
     "tslib": "^2.3.0"
   },
