@@ -1,6 +1,6 @@
 {
   "name": "@trt-web/angular",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": false,
   "description": "Reusable Angular directives, pipes, services, and reactive utilities.",
   "repository": {
@@ -33,9 +33,9 @@
   },
   "dependencies": {
     "@angular/aria": "^22.0.4",
-    "@trt-web/browser": "^1.0.3",
+    "@trt-web/browser": "^1.0.4",
     "@trt-web/cli": "^1.1.0",
-    "@trt-web/core": "^1.6.2",
+    "@trt-web/core": "^1.6.3",
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
