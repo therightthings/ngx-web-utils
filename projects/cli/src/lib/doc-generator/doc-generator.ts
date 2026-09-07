@@ -476,7 +476,12 @@ export class DocGenerator {
   }
 
   private static styles(): string {
-    return readFile(fileURLToPath(new URL('../../assets/styles.css', import.meta.url)));
+    const styles = readFile(fileURLToPath(new URL('../../assets/styles.css', import.meta.url)));
+    const highlighterStyles = readFile(
+      fileURLToPath(new URL('../../assets/highlighter.css', import.meta.url)),
+    );
+
+    return `${styles}\n${highlighterStyles}`;
   }
 
   private static scripts(): string {
