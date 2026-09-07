@@ -4,22 +4,85 @@ An Nx monorepo of focused, strongly typed TypeScript utilities for web applicati
 
 ## Packages
 
-- `@trt-web/core`: framework-agnostic utilities for dates, DOM, files, images, objects, strings, numbers, timing, workers, and shared application tasks.
-- `@trt-web/browser`: typed wrappers for modern browser and Web Platform APIs, including media, audio, storage, permissions, speech, networking, and device features.
-- `@trt-web/angular`: Angular directives, pipes, components, accessibility wrappers, form helpers, signals, state management, and HTTP caching.
-- `@trt-web/firebase-admin`: backend utilities for Firebase Admin authentication, Firestore, Storage, messaging, caching, and Express integrations.
-- `@trt-web/cli`: README-driven interactive CLIs and static documentation generation.
-- `@trt-web/react` and `@trt-web/vue`: reusable typed building blocks for React and Vue applications.
+### [`@trt-web/core`](https://www.npmjs.com/package/@trt-web/core)
+
+- Framework-agnostic utilities for dates, DOM, files, images, objects, strings, numbers, timing, workers, and shared application tasks.
+
+- Documentation: [trt-core](https://core.trt-web.surge.sh)
+
+### [`@trt-web/browser`](https://www.npmjs.com/package/@trt-web/browser)
+
+- Typed wrappers for modern browser and Web Platform APIs, including media, audio, storage, permissions, speech, networking, and device features.
+
+- Documentation: [trt-browser](https://browser.trt-web.surge.sh)
+
+### [`@trt-web/angular`](https://www.npmjs.com/package/@trt-web/angular)
+
+- Angular directives, pipes, components, accessibility wrappers, form helpers, signals, state management, and HTTP caching.
+
+- Documentation: [trt-angular](https://angular.trt-web.surge.sh)
+
+### [`@trt-web/firebase-admin`](https://www.npmjs.com/package/@trt-web/firebase-admin)
+
+- Backend utilities for Firebase Admin authentication, Firestore, Storage, messaging, caching, and Express integrations.
+
+- Documentation: [trt-firebase-admin](https://firebase-admin.trt-web.surge.sh)
+
+### [`@trt-web/cli`](https://www.npmjs.com/package/@trt-web/cli)
+
+- README-driven interactive CLIs and static documentation generation.
+
+- Documentation: [trt-cli](https://github.com/therightthings/trt-web#readme)
+
+### [`@trt-web/react`](https://www.npmjs.com/package/@trt-web/react)
+
+- Reusable typed building blocks for React applications.
+
+- Documentation: [trt-react](https://github.com/therightthings/trt-web#readme)
+
+### [`@trt-web/vue`](https://www.npmjs.com/package/@trt-web/vue)
+
+- Reusable typed building blocks for Vue applications.
+
+- Documentation: [trt-vue](https://github.com/therightthings/trt-web#readme)
 
 ## Installation
 
-Install the package you need:
+Install only the package your application needs:
 
-- `npm install @trt-web/core` if you want the shared helpers directly.
-- `npm install @trt-web/angular` for Angular projects.
-- `npm install @trt-web/firebase-admin` for Firebase Admin backend projects.
+```bash
+npm install @trt-web/core
+npm install @trt-web/browser
+npm install @trt-web/angular
+npm install @trt-web/firebase-admin
+npm install @trt-web/cli
+npm install @trt-web/react
+npm install @trt-web/vue
+```
 
-Use `yarn add` or `bun add` when using another package manager.
+With Yarn:
+
+```bash
+yarn add @trt-web/core
+yarn add @trt-web/browser
+yarn add @trt-web/angular
+yarn add @trt-web/firebase-admin
+yarn add @trt-web/cli
+yarn add @trt-web/react
+yarn add @trt-web/vue
+```
+
+With Bun:
+
+```bash
+bun add @trt-web/core
+bun add @trt-web/browser
+bun add @trt-web/angular
+bun add @trt-web/firebase-admin
+bun add @trt-web/cli
+bun add @trt-web/react
+bun add @trt-web/vue
+```
 
 ## CLI and documentation
 
