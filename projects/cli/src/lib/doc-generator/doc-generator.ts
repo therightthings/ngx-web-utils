@@ -176,6 +176,7 @@ export class DocGenerator {
       <strong>${this.escapeHtml(title)}</strong>
       <button id="theme-toggle" type="button" aria-label="Toggle theme"><span class="theme-moon">${Icons.themeIcon}</span><span class="theme-sun">${Icons.sunIcon}</span></button>
     </header>
+    <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-header">
@@ -240,7 +241,7 @@ export class DocGenerator {
 
     return /*html*/ `
       <article class="utility" id="utility-${utility.id}" data-search="${this.escapeHtml(`${utility.title} ${utility.description} ${utility.methods.map((method) => method.signature).join(' ')}`.toLowerCase())}">
-        <h2>${this.escapeHtml(utility.title)}</h2>
+        <h2 class="truncate" title="${this.escapeHtml(utility.title)}">${this.escapeHtml(utility.title)}</h2>
         ${this.renderUtilityBlocks(utility, utilityNames, config)}
         ${examples ? `${utility.hasExamplesSection ? '<h3>Examples</h3>' : ''}${examples}` : ''}${sections}${
           methods ? `<h3>Methods</h3><ul>${methods}</ul>` : ''

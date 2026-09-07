@@ -1,5 +1,6 @@
 const root = document.documentElement;
 const sidebar = document.querySelector('.sidebar');
+const drawerBackdrop = document.querySelector('#drawer-backdrop');
 const search = document.querySelector('#search');
 const searchClear = document.querySelector('#search-clear');
 const links = [...document.querySelectorAll('.utility-link')];
@@ -23,7 +24,17 @@ function toggleTheme() {
 
 document.querySelector('#theme-toggle').onclick = toggleTheme;
 document.querySelector('#desktop-theme-toggle').onclick = toggleTheme;
-document.querySelector('#menu-toggle').onclick = () => sidebar.classList.toggle('open');
+function closeDrawer() {
+  sidebar.classList.remove('open');
+  drawerBackdrop.classList.remove('visible');
+}
+function toggleDrawer() {
+  const open = sidebar.classList.toggle('open');
+  drawerBackdrop.classList.toggle('visible', open);
+}
+
+document.querySelector('#menu-toggle').onclick = toggleDrawer;
+drawerBackdrop.onclick = closeDrawer;
 
 function setGroupExpanded(group, expanded) {
   const content = group.querySelector('.group-utilities');
@@ -80,6 +91,7 @@ links.forEach((link) => {
       updateToggleAll();
     }
     sidebar.classList.remove('open');
+    drawerBackdrop.classList.remove('visible');
   };
 });
 

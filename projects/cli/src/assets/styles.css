@@ -70,6 +70,9 @@ body {
   border-right: 1px solid var(--border);
   overflow: auto;
 }
+.drawer-backdrop {
+  display: none;
+}
 .brand {
   position: sticky;
   top: -16px;
@@ -314,9 +317,6 @@ nav {
   background: var(--accent);
   color: #102033;
 }
-.utility-link:hover {
-  transform: translateX(2px);
-}
 .utility-link.active {
   box-shadow: 0 0 0 1px rgb(125 211 252 / 35%);
 }
@@ -372,6 +372,11 @@ nav {
   color: var(--muted);
   line-height: 1.6;
 }
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .utility ul {
   padding-left: 20px;
 }
@@ -386,8 +391,9 @@ nav {
   border: 0;
   border-top: 1px solid var(--border);
 }
-.utility code,
 .code-block {
+  display: flow-root;
+  margin: 16px 0;
   position: relative;
 }
 .code-language {
@@ -449,6 +455,7 @@ nav {
   color: rgb(106 153 85);
 }
 .utility pre {
+  margin: 0;
   padding: 18px;
   overflow: auto;
   background: #1e1e1e;
@@ -500,12 +507,22 @@ nav {
   }
   .sidebar.open {
     display: block;
-    z-index: 2;
+    z-index: 30;
     width: min(280px, 85vw);
+  }
+  .drawer-backdrop.visible {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgb(0 0 0 / 45%);
   }
   .main {
     margin: 0;
-    padding: 24px;
+    padding: 0px;
+  }
+  .utility {
+    border-radius: 0px;
   }
   .main > h1 {
     font-size: 32px;
@@ -514,7 +531,7 @@ nav {
     display: flex;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 10;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
