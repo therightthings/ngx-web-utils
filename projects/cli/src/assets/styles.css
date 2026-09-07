@@ -516,6 +516,10 @@ nav {
   display: none;
 }
 @media (max-width: 700px) {
+  #desktop-theme-toggle {
+    display: none;
+  }
+
   .sidebar {
     display: none;
   }
@@ -537,6 +541,7 @@ nav {
   }
   .utility {
     border-radius: 0px;
+    min-height: calc(100dvh - 65px);
   }
   .main > h1 {
     font-size: 32px;

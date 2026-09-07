@@ -1,14 +1,58 @@
 # @trt-web/core
 
-Framework-agnostic TypeScript utilities for everyday web application development.
+## Introduction
 
-## Installation
+- `@trt-web/core` is a framework-agnostic TypeScript toolkit for common web application tasks.
+- It provides focused, strongly typed utilities for dates, DOM, files, images, objects, strings, numbers, timing, workers, and more.
+- Use the utilities independently in browser applications, shared packages, and framework projects.
 
-- With NPM (or Yarn, Bun,...):
+---
+
+**Why `@trt-web/core`?**
+
+- Framework-agnostic and suitable for TypeScript or JavaScript applications.
+- Small, reusable utilities with predictable APIs.
+- Strong typing for common application and Web Platform tasks.
+- Modular APIs that can be adopted without changing application architecture.
+
+---
+
+**Install**
 
 ```bash
 npm install @trt-web/core
 ```
+
+```bash
+yarn add @trt-web/core
+```
+
+```bash
+bun add @trt-web/core
+```
+
+---
+
+**CLI**
+
+- The package includes `trt-core`, a CLI for discovering utilities, inspecting methods and examples, and generating static documentation.
+
+```bash
+npx trt-core
+npx trt-core --list
+npx trt-core info cleanObj
+npx trt-core docs
+```
+
+---
+
+**For Contributors**
+
+- Contributions and improvements are welcome. See `CONTRIBUTING.md` for development, testing, and pull request guidelines.
+- Contact:
+  - Github: [therightthings/trt-web](https://github.com/therightthings/trt-web)
+  - NPM: [@trt-web/core](https://www.npmjs.com/package/@trt-web/core)
+  - Email: nanam133hg@gmail.com (Nam Nguyen)
 
 ## trt.worker
 
