@@ -44,4 +44,23 @@ describe('Highlighter', () => {
     expect(typescript).toContain('<span class="token-comment">// note</span>');
     expect(html).toContain('<span class="token-comment">&lt;!-- note --&gt;</span>');
   });
+
+  it('escapes HTML source and highlights only HTML syntax', () => {
+    const html = Highlighter.highlight(
+      {
+        content: '<li style="">Framework-agnostic and suitable for TypeScript applications.</li>',
+        language: 'html',
+      },
+      { output: 'html' },
+    );
+
+    expect(html).toContain('&lt;<span class="token-keyword">li</span>');
+    expect(html).toContain(
+      '<span class="token-method">style</span>=<span class="token-string">&quot;&quot;</span>',
+    );
+    expect(html).toContain('Framework-agnostic and suitable for TypeScript applications.');
+    expect(html).not.toContain('token-type');
+    expect(html).not.toContain('token-variable');
+    expect(html).toContain('&lt;/<span class="token-keyword">li</span>&gt;');
+  });
 });

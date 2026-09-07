@@ -34,6 +34,11 @@ export class Highlighter {
 
     const names = utilityNames.length ? utilityNames.map(this.escapeRegExp).join('|') : '(?!)';
     const colors: CodeThemeDetail = typeof theme === 'string' ? THEME_MAP[theme] : theme;
+
+    if (language === 'html' && output === 'html') {
+      return this.highlightHtml(content, colors);
+    }
+
     const languageConfig = KEYWORD_MAP[language];
     const comments = languageConfig.comments.join('|');
     const keywords = languageConfig.keywords.map(this.escapeRegExp).join('|');
@@ -112,6 +117,53 @@ export class Highlighter {
         return token;
       },
     );
+  }
+
+  private static highlightHtml(content: string, colors: CodeThemeDetail): string {
+    const htmlTokenPattern = /<!--[\s\S]*?-->|<[^>]*>/g;
+    let result = '';
+    let lastIndex = 0;
+
+    for (const match of content.matchAll(htmlTokenPattern)) {
+      result += this.escapeHtml(content.slice(lastIndex, match.index));
+      const token = match[0];
+
+      if (token.startsWith('<!--')) {
+        result += this.renderToken('comment', colors.comment, token, 'html');
+      } else {
+        result += this.highlightHtmlTag(token, colors);
+      }
+
+      lastIndex = (match.index ?? 0) + token.length;
+    }
+
+    return result + this.escapeHtml(content.slice(lastIndex));
+  }
+
+  private static highlightHtmlTag(tag: string, colors: CodeThemeDetail): string {
+    const tagPattern = /^(<\/?)([A-Za-z][\w:-]*)([\s\S]*?)(\/?>)$/;
+    const match = tag.match(tagPattern);
+
+    if (!match) {
+      return this.escapeHtml(tag);
+    }
+
+    const [, prefix, tagName, attributes, suffix] = match;
+    let highlightedAttributes = '';
+    let lastIndex = 0;
+    const attributePattern = /([:\w-]+)(\s*=\s*)("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g;
+
+    for (const attribute of attributes.matchAll(attributePattern)) {
+      highlightedAttributes += this.escapeHtml(attributes.slice(lastIndex, attribute.index));
+      highlightedAttributes += this.renderToken('method', colors.method, attribute[1], 'html');
+      highlightedAttributes += this.escapeHtml(attribute[2]);
+      highlightedAttributes += this.renderToken('string', colors.string, attribute[3], 'html');
+      lastIndex = (attribute.index ?? 0) + attribute[0].length;
+    }
+
+    highlightedAttributes += this.escapeHtml(attributes.slice(lastIndex));
+
+    return `${this.escapeHtml(prefix)}${this.renderToken('keyword', colors.keyword, tagName, 'html')}${highlightedAttributes}${this.escapeHtml(suffix)}`;
   }
 
   private static renderToken(
