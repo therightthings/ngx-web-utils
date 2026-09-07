@@ -1,18 +1,18 @@
 :root {
   color-scheme: dark;
-  --bg: #101827;
-  --surface: #172236;
-  --sidebar: #0d1524;
-  --input: #101827;
-  --border: #26364e;
-  --text: #e8edf5;
-  --muted: #b9c5d6;
-  --accent: #7dd3fc;
-  --accent-soft: #1e3a5f;
-  --accent-hover: #28527f;
-  --scrollbar: #48627f;
-  --code-inline-bg: #26364e;
-  --code-inline-text: #d7f3ff;
+  --bg: #0b0b0b;
+  --surface: #151515;
+  --sidebar: #101010;
+  --input: #0d0d0d;
+  --border: #2c2c2c;
+  --text: #f2f2f2;
+  --muted: #a6a6a6;
+  --accent: #d4d4d4;
+  --accent-soft: #242424;
+  --accent-hover: #363636;
+  --scrollbar: #555;
+  --code-inline-bg: #292929;
+  --code-inline-text: #f0f0f0;
 }
 html[data-theme='light'] {
   color-scheme: light;
@@ -23,6 +23,7 @@ html[data-theme='light'] {
   --border: #d4dce8;
   --text: #172236;
   --muted: #52627a;
+  --accent: #334155;
   --scrollbar: #64748b;
   --accent-soft: #e0f2fe;
   --accent-hover: #bae6fd;
@@ -63,6 +64,8 @@ body {
 }
 .sidebar {
   position: fixed;
+  display: flex;
+  flex-direction: column;
   inset: 0 auto 0 0;
   width: 280px;
   padding: 16px;
@@ -217,6 +220,15 @@ html[data-theme='light'] .theme-sun {
 nav {
   padding: 0px;
 }
+.sidebar-version {
+  margin-top: auto;
+  padding: 16px 12px 4px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  text-align: center;
+}
 .group {
   margin-top: 12px;
 }
@@ -315,10 +327,10 @@ nav {
 .utility-link:hover,
 .utility-link.active {
   background: var(--accent);
-  color: #102033;
+  color: var(--bg);
 }
 .utility-link.active {
-  box-shadow: 0 0 0 1px rgb(125 211 252 / 35%);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 18%);
 }
 .utility-link:focus-visible {
   outline: 2px solid var(--accent);
@@ -370,7 +382,7 @@ nav {
 }
 .utility p {
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.75;
 }
 .truncate {
   overflow: hidden;
@@ -382,9 +394,11 @@ nav {
 }
 .utility li {
   margin: 14px 0;
+  line-height: 1.75;
 }
 .utility li p {
   margin: 6px 0;
+  line-height: 1.75;
 }
 .utility hr {
   margin: 24px 0;

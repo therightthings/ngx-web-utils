@@ -38,8 +38,11 @@ type DocGroup = {
 export class DocGenerator {
   static generate(config: DocGeneratorConfig): string {
     const readme = readFile(config.readmePath);
+    const packageVersion = config.packageJsonPath
+      ? (JSON.parse(readFile(config.packageJsonPath)) as { version?: string }).version
+      : undefined;
     const document = this.createDocument(parseReadme(readme));
-    const html = minifyHtml(this.renderDocument(document, config));
+    const html = minifyHtml(this.renderDocument(document, config, packageVersion));
     const outputFile = this.getOutputFile(config.outputPath);
 
     mkdirSync(path.dirname(outputFile), { recursive: true });
@@ -133,6 +136,7 @@ export class DocGenerator {
   private static renderDocument(
     document: { groups: DocGroup[] },
     config: DocGeneratorConfig,
+    packageVersion?: string,
   ): string {
     const title = config.title ?? 'Documentation';
     const favicon = `data:image/svg+xml;base64,${Buffer.from(Icons.brandIcon).toString('base64')}`;
@@ -192,6 +196,7 @@ export class DocGenerator {
       </div>
       <button id="toggle-all" class="toggle-all" type="button">Expand all</button>
       <nav>${groups}</nav>
+      ${packageVersion ? `<div class="sidebar-version">v${this.escapeHtml(packageVersion)}</div>` : ''}
     </aside>
     <main class="main">
       <section id="content">${utilities}</section>

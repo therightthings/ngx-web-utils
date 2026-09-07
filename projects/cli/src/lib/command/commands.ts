@@ -117,6 +117,7 @@ export class TrtCommand {
 
         DocGenerator.generate({
           readmePath: config.readmePath,
+          packageJsonPath: config.packageJsonPath,
           ...config.docs,
         });
       });
