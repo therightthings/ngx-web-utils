@@ -1,6 +1,65 @@
 # @trt-web/browser
 
-Framework-free wrappers for modern browser APIs and web platform features.
+## Introduction
+
+- `@trt-web/browser` is a framework-agnostic TypeScript toolkit for working with modern browser APIs and Web Platform features.
+
+- It provides focused, strongly typed wrappers for media, audio, storage, permissions, speech, networking, window management, device APIs, and browser-native AI capabilities where supported. The APIs are designed to stay close to the Web Platform while providing a consistent and reusable interface for common browser interactions.
+
+- Use `@trt-web/browser` to build dashboards, PWAs, productivity tools, media experiences, and other modern browser-based applications.
+
+---
+
+**Why `@trt-web/browser`?**
+
+- Framework-agnostic and suitable for TypeScript or JavaScript applications.
+- Strongly typed APIs built around native browser capabilities.
+- Modular utilities that can be adopted independently.
+- Explicit handling for unsupported APIs and permission-based features.
+
+---
+
+**Install**
+
+- Install the package using your preferred package manager:
+
+```bash
+npm install @trt-web/browser
+```
+
+```bash
+yarn add @trt-web/browser
+```
+
+```bash
+bun add @trt-web/browser
+```
+
+---
+
+**CLI**
+
+- The package includes trt-browser, an interactive CLI for discovering available utilities, exploring methods and usage examples, and generating static documentation from the package README.
+
+```bash
+npx trt-browser
+npx trt-browser --list
+npx trt-browser info BrowserCamera # or any available utility name
+npx trt-browser docs
+```
+
+---
+
+**For Contributors**
+
+- All contributions are welcome.
+
+- If you find a bug, want to improve an existing API, or have an idea for a new Web Platform utility, please see `CONTRIBUTING.md` for contribution guidelines, testing expectations, and pull request requirements.
+
+- Contact:
+  - Github: [therightthings/trt-web](https://github.com/therightthings/trt-web)
+  - NPM: [@trt-web/browser](https://www.npmjs.com/package/@trt-web/browser)
+  - Email: nanam133hg@gmail.com (Nam Nguyen)
 
 ## BrowserAI
 
@@ -18,12 +77,6 @@ Built-in browser AI helpers
 
 ```ts
 import { BrowserAI } from '@trt-web/browser';
-onProgress: ({ phase, progress }) => {
-  console.log(phase, `${Math.round(progress * 100)}%`);
-};
-// Output: downloading 50%
-// Output: processing 0%
-// Output: done 100%
 
 if (BrowserAI.isTranslatorSupported()) {
   const availability = await BrowserAI.translateAvailability({
@@ -37,6 +90,11 @@ if (BrowserAI.isTranslatorSupported()) {
       targetLanguage: 'vi',
       onProgress: (progress) => {
         console.log(progress.phase, `${Math.round(progress.progress * 100)}%`);
+        /**
+         * downloading 50%
+         * processing 0%
+         * done 100%
+         */
       },
     });
     console.log(translated);
@@ -82,6 +140,7 @@ Web Audio API helpers
 
 ```ts
 import { BrowserAudioContext } from '@trt-web/browser';
+
 if (!BrowserAudioContext.isSupported()) {
   throw new Error('Web Audio API is not supported.');
 }
@@ -107,12 +166,10 @@ await audioContext.playTone({
 
 const file = await fetch('/audio/example.mp3').then((response) => response.blob());
 const audioBuffer = await audioContext.decodeAudioData(await file.arrayBuffer());
-const session = audioBuffer ? audioContext.createAudioSession(audioBuffer) : undefined;
-session?.play();
+const audioSession = audioBuffer ? audioContext.createAudioSession(audioBuffer) : undefined;
+audioSession?.play();
 await new Promise((resolve) => setTimeout(resolve, (audioBuffer?.duration ?? 0) * 1000));
-session?.stop();
-
-await audioContext.close();
+audioSession?.stop();
 
 const toneSession = audioContext.createToneSession({
   tones: [
@@ -133,17 +190,18 @@ console.log(timeDomainData?.length); // analyser.fftSize
 toneSession?.stop();
 console.log(toneSession?.state); // 'stopped'
 
-const session = audioContext.createAudioSession(audioBuffer);
+const playbackSession = audioBuffer ? audioContext.createAudioSession(audioBuffer) : undefined;
+playbackSession?.play();
+playbackSession?.pause();
+playbackSession?.resume();
+playbackSession?.stop();
 
-session?.play();
-session?.pause();
-session?.resume();
-session?.stop();
+playbackSession?.createAnalyser({ fftSize: 2048 });
+console.log(playbackSession?.getFrequencyData());
+console.log(playbackSession?.getTimeDomainData());
+console.log(playbackSession?.getWaveformData({ samples: 500 }));
 
-session?.createAnalyser({ fftSize: 2048 });
-console.log(session?.getFrequencyData());
-console.log(session?.getTimeDomainData());
-console.log(session?.getWaveformData({ samples: 500 }));
+await audioContext.close();
 ```
 
 ## BrowserBattery
@@ -159,15 +217,19 @@ Battery status helpers
 ### Examples
 
 ```ts
+import { BrowserBattery } from '@trt-web/browser';
+
 if (BrowserBattery.isSupported()) {
   const state = await BrowserBattery.getState();
   console.log(state);
-  // {
-  //   charging: true,
-  //   percent: 80,
-  //   chargingTimeSeconds: 1800,
-  //   dischargingTimeSeconds: 9007199254740991,
-  // }
+  /**
+   * {
+   *  charging: true,
+   *   percent: 80,
+   *   chargingTimeSeconds: 1800,
+   *   dischargingTimeSeconds: 9007199254740991,
+   * }
+   */
 
   const subscription = await BrowserBattery.subscribe((nextState) => {
     console.log(nextState.percent, nextState.charging);
@@ -203,17 +265,19 @@ Web Bluetooth helpers
 
 ```ts
 import { BrowserBluetooth } from '@trt-web/browser';
-const device = await BrowserBluetooth.requestDevice({
-  filters: [{ services: ['heart_rate'] }],
-});
-await BrowserBluetooth.connect(device);
-console.log(BrowserBluetooth.getDevice(), BrowserBluetooth.getServer());
-const value = await BrowserBluetooth.readValue({
-  service: 'heart_rate',
-  characteristic: 'heart_rate_measurement',
-});
-await BrowserBluetooth.disconnect();
-console.log(value);
+
+if (BrowserBluetooth.isSupported() && (await BrowserBluetooth.isAvailable())) {
+  // Run this from a user gesture, such as a button click.
+  const device = await BrowserBluetooth.requestDevice({
+    filters: [{ services: ['heart_rate'] }],
+  });
+  const server = await BrowserBluetooth.connect(device);
+  if (server) {
+    const value = await BrowserBluetooth.readValue('heart_rate', 'heart_rate_measurement');
+    console.log(value);
+    await BrowserBluetooth.disconnect();
+  }
+}
 ```
 
 ## BrowserCamera
@@ -233,9 +297,10 @@ Camera capture and recording
 
 ```ts
 import { BrowserCamera } from '@trt-web/browser';
-const video = document.querySelector<HTMLVideoElement>('#camera-preview')!;
+
+const video = document.querySelector<HTMLVideoElement>('#camera-preview');
 const result = await BrowserCamera.turnOn({ facingMode: 'front' });
-if (result.success) {
+if (result.success && video) {
   video.srcObject = result.data;
 
   const recorder = await BrowserCamera.createRecorder({ mimeType: 'video/webm' });
@@ -246,6 +311,8 @@ if (result.success) {
   console.log(output?.blob);
 
   BrowserCamera.turnOff();
+} else {
+  console.error('Camera access was denied or is not supported.');
 }
 ```
 
@@ -263,6 +330,7 @@ Clipboard read and write helpers
 
 ```ts
 import { BrowserClipboard } from '@trt-web/browser';
+
 const copied = await BrowserClipboard.copy('Copied from the browser');
 const text = await BrowserClipboard.read();
 console.log(copied); // { permission: 'granted', data: 'Copied from the browser', success: true }
@@ -433,6 +501,7 @@ File System Access API helpers
 
 ```ts
 import { BrowserFileSystem } from '@trt-web/browser';
+
 const file = await BrowserFileSystem.readFile();
 if (file) {
   console.log(file.file.name, file.file.size);
@@ -459,7 +528,7 @@ IndexedDB database and collection helpers
 ### Examples
 
 ```ts
-import { IndexedDB } from '@trt-web/core';
+import { IndexedDB } from '@trt-web/browser';
 
 type User = {
   id: number;
@@ -507,6 +576,7 @@ Geolocation helpers
 
 ```ts
 import { BrowserLocation } from '@trt-web/browser';
+
 const location = await BrowserLocation.getLocation({ speed: 'fast' });
 console.log(location); // { permission: 'granted', data: { coords: { latitude: 5, longitude: 6 } }, success: true }
 console.log(await BrowserLocation.getLocation({ speed: 'accurate' })); // { permission: 'granted', data: { coords: { latitude: 3, longitude: 4 } }, success: true }
@@ -529,6 +599,7 @@ Microphone capture and recording
 
 ```ts
 import { BrowserMicrophone } from '@trt-web/browser';
+
 const audio = document.querySelector<HTMLAudioElement>('#microphone-preview')!;
 const result = await BrowserMicrophone.turnOn();
 
@@ -562,6 +633,7 @@ Network status and connection information
 
 ```ts
 import { BrowserNetwork } from '@trt-web/browser';
+
 const subscription = BrowserNetwork.subscribe((state) => {
   console.log(state.status, state.effectiveType);
 });
@@ -586,11 +658,14 @@ Web NFC helpers
 
 ```ts
 import { BrowserNfc } from '@trt-web/browser';
-await BrowserNfc.startScan({
-  onReading: (event) => console.log(event.message),
-});
-await BrowserNfc.write({ records: [{ recordType: 'text', data: 'Hello NFC' }] });
-BrowserNfc.stopScan();
+
+if (BrowserNfc.isSupported()) {
+  await BrowserNfc.startScan({
+    onReading: (event) => console.log(event.message),
+  });
+  await BrowserNfc.write({ records: [{ recordType: 'text', data: 'Hello NFC' }] });
+  BrowserNfc.stopScan();
+}
 ```
 
 ## BrowserNotification
@@ -609,6 +684,7 @@ Web Notifications API helpers
 
 ```ts
 import { BrowserNotification } from '@trt-web/browser';
+
 if (BrowserNotification.isSupported()) {
   const permission = await BrowserNotification.getPermission();
   const nextPermission =
@@ -688,6 +764,7 @@ WebRTC peer connection helpers
 
 ```ts
 import { BrowserPeerConnection } from '@trt-web/browser';
+
 BrowserPeerConnection.createPeerConnection({
   config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] },
   handlers: { onIceCandidate: (event) => console.log(event.candidate) },
@@ -706,8 +783,7 @@ await BrowserPeerConnection.setLocalDescription(offer);
 BrowserPeerConnection.close();
 
 if (offer) {
-  const connection = await BrowserPeerConnection.createConnectionFromOffer({
-    offer,
+  const connection = await BrowserPeerConnection.createConnectionFromOffer(offer, {
     handlers: { onIceCandidate: (event) => console.log(event.candidate) },
   });
   connection?.close();
@@ -737,8 +813,10 @@ Performance API helpers
 
 ```ts
 import { BrowserPerformance } from '@trt-web/browser';
+
 const result = await BrowserPerformance.measureAsync('load-users', async () => {
-  return await loadUsers();
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  return [{ id: 1, name: 'Alice' }];
 });
 
 console.log(result?.value, result?.measure.duration);
@@ -765,6 +843,7 @@ Browser permission helpers
 
 ```ts
 import { BrowserPermission } from '@trt-web/browser';
+
 const current = await BrowserPermission.getState('geolocation');
 console.log(BrowserPermission.supportedPermissions()); // ['geolocation', 'notifications', ...]
 const requested = current === 'prompt' ? await BrowserPermission.request('geolocation') : current;
@@ -789,11 +868,16 @@ Fullscreen and picture-in-picture helpers
 
 ```ts
 import { BrowserPresentation } from '@trt-web/browser';
-const entered = await BrowserPresentation.enterFullscreen(element);
+
+const element = document.querySelector<HTMLElement>('#preview');
+const video = document.querySelector<HTMLVideoElement>('#video-preview');
+const entered = await BrowserPresentation.enterFullscreen(element ?? undefined);
 const exited = await BrowserPresentation.exitFullscreen();
 console.log({ entered, exited }); // { entered: true, exited: true }
 console.log(await BrowserPresentation.enterFullscreen()); // false when fullscreen is unsupported
-console.log(await BrowserPresentation.enterPictureInPicture(video)); // true
+if (video) {
+  console.log(await BrowserPresentation.enterPictureInPicture(video)); // true
+}
 console.log(await BrowserPresentation.exitPictureInPicture()); // true
 ```
 
@@ -858,6 +942,7 @@ Screen sharing and recording
 
 ```ts
 import { BrowserScreen } from '@trt-web/browser';
+
 const screenshot = await BrowserScreen.screenshot({
   image: { type: 'image/png' },
 });
@@ -893,11 +978,15 @@ Speech recognition helpers
 
 ```ts
 import { BrowserSpeechToText } from '@trt-web/browser';
-const text = await BrowserSpeechToText.recognize({
-  lang: 'en-US',
-  interimResults: true,
-});
-console.log(text);
+
+if (BrowserSpeechToText.isSupported()) {
+  // Start recognition from a user gesture, such as a button click.
+  const text = await BrowserSpeechToText.recognize({
+    lang: 'en-US',
+    interimResults: true,
+  });
+  console.log(text);
+}
 ```
 
 ## BrowserTextToSpeech
@@ -919,8 +1008,11 @@ Speech synthesis helpers
 
 ```ts
 import { BrowserTextToSpeech } from '@trt-web/browser';
-await BrowserTextToSpeech.speak('Hello from the browser', { lang: 'en-US' });
-console.log(BrowserTextToSpeech.isSpeaking());
+
+if (BrowserTextToSpeech.isSupported()) {
+  await BrowserTextToSpeech.speak('Hello from the browser', { lang: 'en-US' });
+  console.log(BrowserTextToSpeech.isSpeaking());
+}
 ```
 
 ## BrowserTabActivity
@@ -938,6 +1030,7 @@ Tab visibility and focus helpers
 
 ```ts
 import { BrowserTabActivity } from '@trt-web/browser';
+
 const subscription = BrowserTabActivity.subscribe((state) => {
   console.log(state);
 });
@@ -959,6 +1052,7 @@ System theme observation
 
 ```ts
 import { BrowserTheme } from '@trt-web/browser';
+
 const applyTheme = (theme: 'dark' | 'light') => {
   document.documentElement.dataset['theme'] = theme;
 };
@@ -985,8 +1079,11 @@ Vibration API helpers
 
 ```ts
 import { BrowserVibration } from '@trt-web/browser';
-BrowserVibration.vibrate([200, 100, 200]);
-BrowserVibration.cancel();
+
+if (BrowserVibration.isSupported()) {
+  BrowserVibration.vibrate([200, 100, 200]);
+  BrowserVibration.cancel();
+}
 ```
 
 ## BrowserViewport
@@ -1054,9 +1151,12 @@ Screen wake lock helpers
 
 ```ts
 import { BrowserWakeLock } from '@trt-web/browser';
-await BrowserWakeLock.enable();
-console.log(BrowserWakeLock.isActive());
-await BrowserWakeLock.disable();
+
+if (BrowserWakeLock.isSupported()) {
+  const enabled = await BrowserWakeLock.enable();
+  console.log(enabled, BrowserWakeLock.isActive());
+  await BrowserWakeLock.disable();
+}
 ```
 
 ## BrowserWindow
@@ -1083,16 +1183,50 @@ Current window helpers
 
 ```ts
 import { BrowserWindow } from '@trt-web/browser';
+
 BrowserWindow.preload('/assets/app.js');
 BrowserWindow.pushState({ section: 'settings' }, '', '/settings');
 BrowserWindow.replaceState({ section: 'profile' }, '', '/profile');
 console.log(BrowserWindow.historyState());
+
 const confirmed = BrowserWindow.confirm('Continue?');
 if (confirmed) {
   BrowserWindow.print();
 }
 // Call reload when the current page should be loaded again.
 // BrowserWindow.reload();
+```
+
+## BrowserShare
+
+Web Share API helpers
+
+### Methods
+
+- `share(data: BrowserShareData): Promise<ExecuteBrowserServiceResult>`: share content through the browser's native share sheet when supported.
+
+### Examples
+
+```ts
+import { BrowserShare } from '@trt-web/browser';
+
+const result = await BrowserShare.share({
+  title: 'Monthly report',
+  text: 'The report is ready.',
+  url: 'https://example.com/report',
+});
+
+console.log(result);
+/**
+ * {
+ *    permission: 'granted',
+ *    data: {
+ *      title: 'Monthly report',
+ *      text: 'The report is ready.',
+ *      url: 'https://example.com/report'
+ *    },
+ *    success: true
+ * } */
 ```
 
 ## BrowserWindowManager
@@ -1107,6 +1241,7 @@ Child window lifecycle helpers
 
 ```ts
 import { BrowserWindowManager } from '@trt-web/browser';
+
 const child = BrowserWindowManager.open({
   url: '/preview',
   target: 'preview-window',
@@ -1140,15 +1275,6 @@ if (!child) {
 
   child.close();
 }
-
-const result = await BrowserShare.share({
-  title: 'Monthly report',
-  text: 'The report is ready.',
-  url: 'https://example.com/report',
-});
-console.log(result); // { permission: 'granted', data: { title: 'Monthly report', text: 'The report is ready.', url: 'https://example.com/report' }, success: true }
-console.log(await BrowserShare.share({ text: 'Not shareable' })); // { permission: 'denied', success: false } when navigator.canShare() returns false
-console.log(await BrowserShare.share({ text: 'Cancelled' })); // { permission: 'granted', success: false } when navigator.share() rejects
 ```
 
 ## Cookie
@@ -1167,7 +1293,8 @@ Cookie storage helpers
 ### Examples
 
 ```ts
-import { Cookie } from '@trt-web/core';
+import { Cookie } from '@trt-web/browser';
+
 Cookie.set('preferences', { theme: 'dark' }, { expiresIn: 7 });
 const preferences = Cookie.get<{ theme: string }>('preferences');
 console.log(preferences, Cookie.exists('preferences')); // { theme: 'dark' } true
@@ -1194,7 +1321,8 @@ Local storage helpers
 ### Examples
 
 ```ts
-import { LocalStorage } from '@trt-web/core';
+import { LocalStorage } from '@trt-web/browser';
+
 LocalStorage.set('profile', { id: 1, name: 'Alice' });
 const profile = LocalStorage.get<{ id: number; name: string }>('profile');
 console.log(profile, LocalStorage.exists('profile')); // { id: 1, name: 'Alice' } true
@@ -1219,7 +1347,8 @@ Session storage helpers
 ### Examples
 
 ```ts
-import { SessionStorage } from '@trt-web/core';
+import { SessionStorage } from '@trt-web/browser';
+
 SessionStorage.set('draft', { title: 'Untitled' });
 console.log(SessionStorage.get('draft')); // { title: 'Untitled' }
 console.log(SessionStorage.exists('draft')); // true

@@ -1,16 +1,62 @@
 # @trt-web/firebase-admin
 
-Firebase Admin utilities for authentication, Firestore, storage, messaging, and backend services.
+## Introduction
 
-## Installation
+- `@trt-web/firebase-admin` is a TypeScript toolkit for building backend services with the Firebase Admin SDK.
+- It provides focused utilities for authentication, Firestore, Storage, messaging, caching, and Express integrations.
+- Use it in Node.js services, APIs, serverless functions, and other trusted backend environments.
+
+---
+
+**Why `@trt-web/firebase-admin`?**
+
+- Strongly typed helpers around common Firebase Admin workflows.
+- Reusable cache and repository utilities for backend applications.
+- Practical integrations for authentication, storage, messaging, and HTTP services.
+- Modular APIs that can be adopted independently.
+
+---
+
+**Install**
 
 ```bash
 npm install @trt-web/firebase-admin
 ```
 
+```bash
+yarn add @trt-web/firebase-admin
+```
+
+```bash
+bun add @trt-web/firebase-admin
+```
+
 ## Compatibility
 
 Firebase Admin SDK 14 and newer.
+
+---
+
+**CLI**
+
+- The package includes `trt-firebase-admin` for discovering backend utilities, inspecting examples, and generating static documentation.
+
+```bash
+npx trt-firebase-admin
+npx trt-firebase-admin --list
+npx trt-firebase-admin info FireAuthService
+npx trt-firebase-admin docs
+```
+
+---
+
+**For Contributors**
+
+- Contributions are welcome. See `CONTRIBUTING.md` for contribution guidelines, testing expectations, and pull request requirements.
+- Contact:
+  - Github: [therightthings/trt-web](https://github.com/therightthings/trt-web)
+  - NPM: [@trt-web/firebase-admin](https://www.npmjs.com/package/@trt-web/firebase-admin)
+  - Email: nanam133hg@gmail.com (Nam Nguyen)
 
 ## Cache
 

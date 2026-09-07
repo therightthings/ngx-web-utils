@@ -3,11 +3,16 @@ export type ParsedReadmeCodeBlock = {
   code: string;
 };
 
+export type ParsedReadmeBlock =
+  | { type: 'content'; value: string }
+  | { type: 'code'; value: ParsedReadmeCodeBlock };
+
 export type ParsedReadmeNode = {
   level: number;
   title: string;
   content: string;
   codeBlocks: ParsedReadmeCodeBlock[];
+  blocks: ParsedReadmeBlock[];
   children: ParsedReadmeNode[];
 };
 
@@ -29,6 +34,7 @@ export function parseReadme(readme: string): ParsedReadmeNode[] {
     const content = contentLines.join('\n').trim();
     if (content) {
       activeNode.content = activeNode.content ? `${activeNode.content}\n${content}` : content;
+      activeNode.blocks.push({ type: 'content', value: content });
     }
     contentLines = [];
   };
@@ -43,6 +49,10 @@ export function parseReadme(readme: string): ParsedReadmeNode[] {
     activeNode.codeBlocks.push({
       language: codeLanguage,
       code: codeLines.join('\n'),
+    });
+    activeNode.blocks.push({
+      type: 'code',
+      value: activeNode.codeBlocks[activeNode.codeBlocks.length - 1],
     });
     codeLines = [];
     codeLanguage = undefined;
@@ -79,6 +89,7 @@ export function parseReadme(readme: string): ParsedReadmeNode[] {
       title: heading[2].trim(),
       content: '',
       codeBlocks: [],
+      blocks: [],
       children: [],
     };
 

@@ -1,11 +1,14 @@
 const root = document.documentElement;
 const sidebar = document.querySelector('.sidebar');
+const drawerBackdrop = document.querySelector('#drawer-backdrop');
 const search = document.querySelector('#search');
 const searchClear = document.querySelector('#search-clear');
 const links = [...document.querySelectorAll('.utility-link')];
 const utilities = [...document.querySelectorAll('.utility')];
+const copyButtons = [...document.querySelectorAll('.copy-code')];
 const groups = [...document.querySelectorAll('.group')];
 const toggleAll = document.querySelector('#toggle-all');
+const expandableGroups = groups.filter((group) => group.querySelector('.group-utilities'));
 const savedTheme = localStorage.getItem('doc-theme');
 const theme =
   savedTheme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
@@ -21,7 +24,17 @@ function toggleTheme() {
 
 document.querySelector('#theme-toggle').onclick = toggleTheme;
 document.querySelector('#desktop-theme-toggle').onclick = toggleTheme;
-document.querySelector('#menu-toggle').onclick = () => sidebar.classList.toggle('open');
+function closeDrawer() {
+  sidebar.classList.remove('open');
+  drawerBackdrop.classList.remove('visible');
+}
+function toggleDrawer() {
+  const open = sidebar.classList.toggle('open');
+  drawerBackdrop.classList.toggle('visible', open);
+}
+
+document.querySelector('#menu-toggle').onclick = toggleDrawer;
+drawerBackdrop.onclick = closeDrawer;
 
 function setGroupExpanded(group, expanded) {
   const content = group.querySelector('.group-utilities');
@@ -34,9 +47,16 @@ function setGroupExpanded(group, expanded) {
 }
 
 function updateToggleAll() {
+  if (expandableGroups.length === 0) {
+    toggleAll.hidden = true;
+    return;
+  }
+
   const expanded =
-    groups.length > 0 &&
-    groups.every((group) => !group.querySelector('.group-utilities').classList.contains('hidden'));
+    expandableGroups.length > 0 &&
+    expandableGroups.every(
+      (group) => !group.querySelector('.group-utilities').classList.contains('hidden'),
+    );
   toggleAll.textContent = expanded ? 'Collapse all' : 'Expand all';
 }
 
@@ -53,9 +73,11 @@ groups.forEach((group) => {
 
 toggleAll.onclick = () => {
   const expand = toggleAll.textContent === 'Expand all';
-  groups.forEach((group) => setGroupExpanded(group, expand));
+  expandableGroups.forEach((group) => setGroupExpanded(group, expand));
   updateToggleAll();
 };
+
+updateToggleAll();
 
 links.forEach((link) => {
   link.onclick = () => {
@@ -69,6 +91,7 @@ links.forEach((link) => {
       updateToggleAll();
     }
     sidebar.classList.remove('open');
+    drawerBackdrop.classList.remove('visible');
   };
 });
 
@@ -100,3 +123,15 @@ searchClear.onclick = () => {
   search.dispatchEvent(new Event('input'));
   search.focus();
 };
+
+copyButtons.forEach((button) => {
+  button.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(decodeURIComponent(button.dataset.code || ''));
+      button.classList.add('copied');
+      window.setTimeout(() => button.classList.remove('copied'), 2000);
+    } catch {
+      button.classList.remove('copied');
+    }
+  };
+});

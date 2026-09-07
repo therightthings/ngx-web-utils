@@ -1,10 +1,35 @@
 # @trt-web/angular
 
-Reusable Angular directives, pipes, services, and reactive utilities.
+## Introduction
 
-## Installation
+- `@trt-web/angular` is a typed Angular toolkit for reusable directives, pipes, components, forms, and reactive application utilities.
+- It provides focused helpers for accessibility, user interaction, state management, HTTP caching, and common Angular application patterns.
+- Use it with Angular 16 through Angular 22 in dashboards, admin tools, and browser applications.
 
-Install the package with npm, Yarn, or Bun:
+---
+
+**Why `@trt-web/angular`?**
+
+- Designed for Angular applications while keeping APIs focused and composable.
+- Strongly typed utilities for templates, forms, signals, and services.
+- Accessibility-oriented wrappers built around Angular Aria.
+- Independent modules that can be adopted incrementally.
+
+---
+
+**Install**
+
+```bash
+npm install @trt-web/angular
+```
+
+```bash
+yarn add @trt-web/angular
+```
+
+```bash
+bun add @trt-web/angular
+```
 
 ```bash
 npm install @trt-web/angular
@@ -16,9 +41,32 @@ Import the ARIA base styles when using the accessibility wrappers:
 import '@trt-web/angular/aria-base-styles.css';
 ```
 
-## Compatibility
+**Compatibility**
 
 Angular 16 through Angular 22.
+
+---
+
+**CLI**
+
+- The package includes `trt-angular` for discovering Angular utilities, inspecting examples, and generating static documentation.
+
+```bash
+npx trt-angular
+npx trt-angular --list
+npx trt-angular info ActionLockDirective
+npx trt-angular docs
+```
+
+---
+
+**For Contributors**
+
+- Contributions are welcome. See `CONTRIBUTING.md` for contribution guidelines, testing expectations, and pull request requirements.
+- Contact:
+  - Github: [therightthings/trt-web](https://github.com/therightthings/trt-web)
+  - NPM: [@trt-web/angular](https://www.npmjs.com/package/@trt-web/angular)
+  - Email: nanam133hg@gmail.com (Nam Nguyen)
 
 ## Directives
 

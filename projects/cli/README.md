@@ -1,12 +1,45 @@
 # @trt-web/cli
 
-README-driven CLI and static documentation tools for TypeScript libraries.
+## Introduction
 
-## Installation
+- `@trt-web/cli` is a TypeScript toolkit for building interactive package CLIs and static documentation from README content.
+- It keeps package discovery, utility descriptions, methods, and examples close to the source README.
+- Use it to expose consistent `list`, `info`, `docs`, and help experiences for libraries in a monorepo or standalone package.
+
+---
+
+**Why `@trt-web/cli`?**
+
+- README-driven documentation with a predictable structure.
+- Interactive utility discovery for developers.
+- Static HTML output with code highlighting and copyable examples.
+- Reusable building blocks for package-specific CLIs.
+
+---
+
+**Install**
 
 ```bash
 npm install @trt-web/cli
 ```
+
+```bash
+yarn add @trt-web/cli
+```
+
+```bash
+bun add @trt-web/cli
+```
+
+---
+
+**For Contributors**
+
+- Contributions are welcome. See `CONTRIBUTING.md` for contribution guidelines, testing expectations, and pull request requirements.
+- Contact:
+  - Github: [therightthings/trt-web](https://github.com/therightthings/trt-web)
+  - NPM: [@trt-web/cli](https://www.npmjs.com/package/@trt-web/cli)
+  - Email: nanam133hg@gmail.com (Nam Nguyen)
 
 ---
 

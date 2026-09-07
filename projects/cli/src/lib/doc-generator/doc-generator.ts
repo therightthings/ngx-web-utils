@@ -22,6 +22,7 @@ type DocUtility = {
   methods: DocMethod[];
   examples: Array<{ title?: string; code: string; language?: string }>;
   codeBlocks: Array<{ code: string; language?: string }>;
+  blocks: ParsedReadmeNode['blocks'];
   sections: ParsedReadmeNode[];
   hasExamplesSection: boolean;
 };
@@ -37,8 +38,11 @@ type DocGroup = {
 export class DocGenerator {
   static generate(config: DocGeneratorConfig): string {
     const readme = readFile(config.readmePath);
+    const packageVersion = config.packageJsonPath
+      ? (JSON.parse(readFile(config.packageJsonPath)) as { version?: string }).version
+      : undefined;
     const document = this.createDocument(parseReadme(readme));
-    const html = minifyHtml(this.renderDocument(document, config));
+    const html = minifyHtml(this.renderDocument(document, config, packageVersion));
     const outputFile = this.getOutputFile(config.outputPath);
 
     mkdirSync(path.dirname(outputFile), { recursive: true });
@@ -123,6 +127,7 @@ export class DocGenerator {
       methods,
       examples,
       codeBlocks,
+      blocks: node.blocks,
       sections: node.children.filter((child) => !this.isSection(child)),
       hasExamplesSection: Boolean(examplesNode),
     };
@@ -131,6 +136,7 @@ export class DocGenerator {
   private static renderDocument(
     document: { groups: DocGroup[] },
     config: DocGeneratorConfig,
+    packageVersion?: string,
   ): string {
     const title = config.title ?? 'Documentation';
     const favicon = `data:image/svg+xml;base64,${Buffer.from(Icons.brandIcon).toString('base64')}`;
@@ -174,6 +180,7 @@ export class DocGenerator {
       <strong>${this.escapeHtml(title)}</strong>
       <button id="theme-toggle" type="button" aria-label="Toggle theme"><span class="theme-moon">${Icons.themeIcon}</span><span class="theme-sun">${Icons.sunIcon}</span></button>
     </header>
+    <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-header">
@@ -183,12 +190,13 @@ export class DocGenerator {
         </div>
         <div class="search-box">
           <span class="search-icon">${Icons.searchIcon}</span>
-          <input id="search" placeholder="Search utilities..." autocomplete="off">
+          <input id="search" placeholder="Search..." autocomplete="off">
           <button id="search-clear" type="button" aria-label="Clear search" hidden>${Icons.clearIcon}</button>
         </div>
       </div>
       <button id="toggle-all" class="toggle-all" type="button">Expand all</button>
       <nav>${groups}</nav>
+      ${packageVersion ? `<div class="sidebar-version">v${this.escapeHtml(packageVersion)}</div>` : ''}
     </aside>
     <main class="main">
       <section id="content">${utilities}</section>
@@ -224,9 +232,6 @@ export class DocGenerator {
     }
 
     let examples = '';
-    for (const codeBlock of utility.codeBlocks) {
-      examples += this.renderCodeBlock(codeBlock.code, codeBlock.language, utilityNames, config);
-    }
     for (const example of utility.examples) {
       if (example.title) {
         examples += `<h4>${this.escapeHtml(example.title)}</h4>`;
@@ -241,8 +246,8 @@ export class DocGenerator {
 
     return /*html*/ `
       <article class="utility" id="utility-${utility.id}" data-search="${this.escapeHtml(`${utility.title} ${utility.description} ${utility.methods.map((method) => method.signature).join(' ')}`.toLowerCase())}">
-        <h2>${this.escapeHtml(utility.title)}</h2>
-        <p>${this.escapeHtml(utility.description)}</p>
+        <h2 class="truncate" title="${this.escapeHtml(utility.title)}">${this.escapeHtml(utility.title)}</h2>
+        ${this.renderUtilityBlocks(utility, utilityNames, config)}
         ${examples ? `${utility.hasExamplesSection ? '<h3>Examples</h3>' : ''}${examples}` : ''}${sections}${
           methods ? `<h3>Methods</h3><ul>${methods}</ul>` : ''
         }
@@ -265,10 +270,37 @@ export class DocGenerator {
         },
       );
 
-      return `<pre><code>${highlighted}</code></pre>`;
+      return this.renderCopyableCodeBlock(highlighted, code, language);
     }
 
-    return `<pre><code>${this.escapeHtml(code)}</code></pre>`;
+    return this.renderCopyableCodeBlock(this.escapeHtml(code), code, language);
+  }
+
+  private static renderCopyableCodeBlock(
+    renderedCode: string,
+    code: string,
+    language: string | undefined,
+  ): string {
+    const encodedCode = encodeURIComponent(code);
+    const languageLabel = language ? this.getLanguageLabel(language) : '';
+    const badge = languageLabel
+      ? `<span class="code-language">${this.escapeHtml(languageLabel)}</span>`
+      : '';
+    const blockClass = languageLabel ? 'code-block has-language' : 'code-block';
+    return `<div class="${blockClass}">${badge}<button class="copy-code" type="button" aria-label="Copy code" data-code="${this.escapeHtml(encodedCode)}"><svg aria-hidden="true" viewBox="0 0 640 640"><path d="M448 96L439.4 96C428.4 76.9 407.7 64 384 64L256 64C232.3 64 211.6 76.9 200.6 96L192 96C156.7 96 128 124.7 128 160L128 512C128 547.3 156.7 576 192 576L448 576C483.3 576 512 547.3 512 512L512 160C512 124.7 483.3 96 448 96zM264 176C250.7 176 240 165.3 240 152C240 138.7 250.7 128 264 128L376 128C389.3 128 400 138.7 400 152C400 165.3 389.3 176 376 176L264 176z"/></svg></button><pre><code>${renderedCode}</code></pre></div>`;
+  }
+
+  private static getLanguageLabel(language: string): string {
+    return (
+      {
+        ts: 'TypeScript',
+        js: 'JavaScript',
+        html: 'HTML',
+        css: 'CSS',
+        scss: 'SCSS',
+        bash: 'Bash',
+      }[language.toLowerCase()] ?? language
+    );
   }
 
   private static renderSection(
@@ -276,7 +308,7 @@ export class DocGenerator {
     utilityNames: readonly string[],
     config: DocGeneratorConfig,
   ): string {
-    let content = node.content ? `<p>${this.escapeHtml(node.content)}</p>` : '';
+    let content = this.renderMarkdownContent(node.content);
     for (const codeBlock of node.codeBlocks) {
       content += this.renderCodeBlock(codeBlock.code, codeBlock.language, utilityNames, config);
     }
@@ -285,6 +317,115 @@ export class DocGenerator {
     }
 
     return `<section><h3>${this.escapeHtml(node.title)}</h3>${content}</section>`;
+  }
+
+  private static renderUtilityBlocks(
+    utility: DocUtility,
+    utilityNames: readonly string[],
+    config: DocGeneratorConfig,
+  ): string {
+    return utility.blocks
+      .map((block) =>
+        block.type === 'content'
+          ? this.renderMarkdownContent(block.value)
+          : this.renderCodeBlock(block.value.code, block.value.language, utilityNames, config),
+      )
+      .join('');
+  }
+
+  private static renderMarkdownContent(content: string): string {
+    if (!content.trim()) {
+      return '';
+    }
+
+    const lines = content.split(/\r?\n/);
+    const rendered: string[] = [];
+    let paragraph: string[] = [];
+    let list: Array<{ indent: number; value: string }> = [];
+
+    const flushParagraph = (): void => {
+      if (paragraph.length > 0) {
+        rendered.push(`<p>${this.renderInlineMarkdown(paragraph.join(' '))}</p>`);
+        paragraph = [];
+      }
+    };
+
+    const flushList = (): void => {
+      if (list.length > 0) {
+        rendered.push(this.renderNestedList(list));
+        list = [];
+      }
+    };
+
+    for (const line of lines) {
+      const indentation = line.match(/^\s*/)?.[0].length ?? 0;
+      const trimmed = line.trim();
+      const listItem = trimmed.match(/^[-*+]\s+(.+)$/);
+      const isDivider = /^-{3,}$/.test(trimmed);
+
+      if (isDivider) {
+        flushParagraph();
+        flushList();
+        rendered.push('<hr>');
+      } else if (listItem) {
+        flushParagraph();
+        list.push({ indent: indentation, value: listItem[1] });
+      } else if (trimmed) {
+        flushList();
+        paragraph.push(trimmed);
+      } else {
+        flushParagraph();
+        flushList();
+      }
+    }
+
+    flushParagraph();
+    flushList();
+    return rendered.join('');
+  }
+
+  private static renderNestedList(items: Array<{ indent: number; value: string }>): string {
+    const renderLevel = (start: number, indent: number): { html: string; next: number } => {
+      let html = '<ul>';
+      let index = start;
+
+      while (index < items.length) {
+        const item = items[index];
+        if (item.indent < indent) {
+          break;
+        }
+        if (item.indent > indent) {
+          const nested = renderLevel(index, item.indent);
+          html += nested.html;
+          index = nested.next;
+          continue;
+        }
+
+        html += `<li>${this.renderInlineMarkdown(item.value)}`;
+        index += 1;
+        if (index < items.length && items[index].indent > indent) {
+          const nested = renderLevel(index, items[index].indent);
+          html += nested.html;
+          index = nested.next;
+        }
+        html += '</li>';
+      }
+
+      return { html: `${html}</ul>`, next: index };
+    };
+
+    return renderLevel(0, items[0]?.indent ?? 0).html;
+  }
+
+  private static renderInlineMarkdown(value: string): string {
+    let rendered = this.escapeHtml(value);
+    rendered = rendered.replace(
+      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noreferrer">$1</a>',
+    );
+    rendered = rendered.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+    rendered = rendered.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return rendered;
   }
 
   private static getOutputFile(outputPath: string): string {
