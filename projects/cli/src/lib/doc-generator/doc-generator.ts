@@ -185,7 +185,7 @@ export class DocGenerator {
         </div>
         <div class="search-box">
           <span class="search-icon">${Icons.searchIcon}</span>
-          <input id="search" placeholder="Search utilities..." autocomplete="off">
+          <input id="search" placeholder="Search..." autocomplete="off">
           <button id="search-clear" type="button" aria-label="Clear search" hidden>${Icons.clearIcon}</button>
         </div>
       </div>

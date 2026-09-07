@@ -146,6 +146,7 @@ html[data-theme='light'] .theme-sun {
   display: block;
 }
 #search {
+  height: 40px;
   width: 100%;
   box-sizing: border-box;
   padding: 9px 34px;
@@ -211,7 +212,7 @@ html[data-theme='light'] .theme-sun {
   background: var(--accent-hover);
 }
 nav {
-  padding: 12px;
+  padding: 0px;
 }
 .group {
   margin-top: 12px;

@@ -7,6 +7,7 @@ const utilities = [...document.querySelectorAll('.utility')];
 const copyButtons = [...document.querySelectorAll('.copy-code')];
 const groups = [...document.querySelectorAll('.group')];
 const toggleAll = document.querySelector('#toggle-all');
+const expandableGroups = groups.filter((group) => group.querySelector('.group-utilities'));
 const savedTheme = localStorage.getItem('doc-theme');
 const theme =
   savedTheme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
@@ -35,9 +36,16 @@ function setGroupExpanded(group, expanded) {
 }
 
 function updateToggleAll() {
+  if (expandableGroups.length === 0) {
+    toggleAll.hidden = true;
+    return;
+  }
+
   const expanded =
-    groups.length > 0 &&
-    groups.every((group) => !group.querySelector('.group-utilities').classList.contains('hidden'));
+    expandableGroups.length > 0 &&
+    expandableGroups.every(
+      (group) => !group.querySelector('.group-utilities').classList.contains('hidden'),
+    );
   toggleAll.textContent = expanded ? 'Collapse all' : 'Expand all';
 }
 
@@ -54,9 +62,11 @@ groups.forEach((group) => {
 
 toggleAll.onclick = () => {
   const expand = toggleAll.textContent === 'Expand all';
-  groups.forEach((group) => setGroupExpanded(group, expand));
+  expandableGroups.forEach((group) => setGroupExpanded(group, expand));
   updateToggleAll();
 };
+
+updateToggleAll();
 
 links.forEach((link) => {
   link.onclick = () => {
