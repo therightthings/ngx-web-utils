@@ -13,6 +13,13 @@
   --scrollbar: #555;
   --code-inline-bg: #292929;
   --code-inline-text: #f0f0f0;
+  --code-button-border: rgb(255 255 255 / 18%);
+  --code-button-bg: rgb(255 255 255 / 8%);
+  --code-button-hover: rgb(255 255 255 / 18%);
+  --code-button-text: #ddd;
+  --success: #4ade80;
+  --success-text: #102016;
+  --backdrop-bg: rgb(0 0 0 / 45%);
 }
 html[data-theme='light'] {
   color-scheme: light;
@@ -29,6 +36,13 @@ html[data-theme='light'] {
   --accent-hover: #bae6fd;
   --code-inline-bg: #e2e8f0;
   --code-inline-text: #172236;
+  --code-button-border: rgb(51 65 85 / 24%);
+  --code-button-bg: rgb(51 65 85 / 8%);
+  --code-button-hover: rgb(51 65 85 / 16%);
+  --code-button-text: #334155;
+  --success: #22c55e;
+  --success-text: #052e16;
+  --backdrop-bg: rgb(15 23 42 / 32%);
 }
 * {
   box-sizing: border-box;
@@ -416,7 +430,7 @@ nav {
   top: 10px;
   left: 12px;
   padding: 3px 7px;
-  border: 1px solid rgb(255 255 255 / 18%);
+  border: 1px solid var(--code-button-border);
   border-radius: 4px;
   background: rgb(255 255 255 / 8%);
   color: #cbd5e1;
@@ -440,33 +454,6 @@ nav {
   border: 1px solid var(--border);
   font-size: 0.9em;
   white-space: nowrap;
-}
-.token-utility {
-  color: rgb(79 193 255);
-}
-.token-keyword {
-  color: rgb(197 134 192);
-}
-.token-method {
-  color: rgb(220 220 170);
-}
-.token-string {
-  color: rgb(206 145 120);
-}
-.token-type {
-  color: rgb(78 201 176);
-}
-.token-number {
-  color: rgb(181 206 168);
-}
-.token-operator {
-  color: rgb(244 135 113);
-}
-.token-variable {
-  color: rgb(156 220 254);
-}
-.token-comment {
-  color: rgb(106 153 85);
 }
 .utility pre {
   margin: 0;
@@ -492,20 +479,20 @@ nav {
   place-items: center;
   border: 1px solid rgb(255 255 255 / 18%);
   border-radius: 6px;
-  background: rgb(255 255 255 / 8%);
-  color: #ddd;
+  background: var(--code-button-bg);
+  color: var(--code-button-text);
   cursor: pointer;
   transition:
     background 150ms ease,
     color 150ms ease;
 }
 .copy-code:hover {
-  background: rgb(255 255 255 / 18%);
+  background: var(--code-button-hover);
 }
 .copy-code.copied {
-  background: #4ade80;
-  border-color: #4ade80;
-  color: #102016;
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--success-text);
 }
 .copy-code svg {
   width: 100%;
@@ -533,7 +520,7 @@ nav {
     position: fixed;
     inset: 0;
     z-index: 20;
-    background: rgb(0 0 0 / 45%);
+    background: var(--backdrop-bg);
   }
   .main {
     margin: 0;

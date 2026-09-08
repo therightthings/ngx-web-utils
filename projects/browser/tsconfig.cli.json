@@ -7,7 +7,8 @@
     "baseUrl": ".",
     "types": ["node"],
     "paths": {
-      "@trt-web/cli": ["../../dist/cli/src/public-api"]
+      "@trt-web/cli": ["../../dist/cli/src/public-api"],
+      "@trt-web/cli/highlighter": ["../../dist/cli/src/highlighter"]
     }
   },
   "include": ["src/cli.ts"]

@@ -137,3 +137,18 @@ Code examples may use `ts`, `js`, `html`, `css`, `scss`, or `bash` fences. Multi
 - `bash`: Bash and common package or shell commands.
 
 Highlighting is available for both terminal ANSI output and generated HTML documentation. Use `theme: 'none'` to keep the source unchanged.
+
+---
+
+## Reusing `Highlighter`
+
+```ts
+import { Highlighter } from '@trt-web/cli/highlighter';
+
+import '@trt-web/cli/highlighter.css';
+
+const html = Highlighter.highlight(
+  { content: 'const answer: number = 42;', language: 'ts' },
+  { output: 'html', theme: 'vs-code-dark-modern' },
+);
+```
